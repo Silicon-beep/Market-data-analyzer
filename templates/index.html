@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Data Analyzer - Interactive Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 3em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+        }
+        
+        .badges {
+            margin-top: 20px;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            margin: 5px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        
+        .control-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .tab {
+            padding: 15px 30px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 1.1em;
+            color: #666;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .results {
+            display: none;
+        }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .metric-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .metric-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .visualizations {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+        }
+        
+        .viz-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+        }
+        
+        .viz-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .viz-card img {
+            width: 100%;
+            display: block;
+        }
+        
+        .viz-title {
+            padding: 20px;
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+            border-top: 3px solid #667eea;
+        }
+        
+        .comparison-table {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .error {
+            background: #ff6b6b;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        footer {
+            text-align: center;
+            color: white;
+            padding: 30px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Market Data Analyzer</h1>
+            <p class="subtitle">Interactive Financial Analytics & Visualization Platform</p>
+            <div class="badges">
+                <span class="badge">Python + OCaml</span>
+                <span class="badge">Real-time Analysis</span>
+                <span class="badge">Professional Charts</span>
+                <span class="badge">Multiple Metrics</span>
+            </div>
+        </header>
+        
+        <div class="control-panel">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('single')">Single Stock Analysis</button>
+                <button class="tab" onclick="switchTab('compare')">Compare Multiple Stocks</button>
+            </div>
+            
+            <div id="single-tab" class="tab-content active">
+                <form id="single-form">
+                    <div class="form-group">
+                        <label for="symbol">Stock Symbol</label>
+                        <input type="text" id="symbol" value="AAPL" placeholder="Enter stock symbol (e.g., AAPL, TSLA, GOOGL)">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="days">Trading Days</label>
+                        <input type="number" id="days" value="180" min="30" max="500" placeholder="Number of trading days">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" id="use-real-data" checked style="width: auto; margin-right: 10px;">
+                            <span>Use Real Market Data (Yahoo Finance)</span>
+                        </label>
+                        <small style="color: #666; margin-top: 5px; display: block;">Unchecked: Simulated data using Geometric Brownian Motion</small>
+                    </div>
+                    
+                    <button type="submit" class="btn">Generate Analysis</button>
+                </form>
+            </div>
+            
+            <div id="compare-tab" class="tab-content">
+                <form id="compare-form">
+                    <div class="form-group">
+                        <label for="symbols">Stock Symbols (comma-separated)</label>
+                        <input type="text" id="symbols" value="AAPL, GOOGL, MSFT" placeholder="e.g., AAPL, GOOGL, MSFT, TSLA">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="days-compare">Trading Days</label>
+                        <input type="number" id="days-compare" value="180" min="30" max="500">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" id="use-real-data-compare" checked style="width: auto; margin-right: 10px;">
+                            <span>Use Real Market Data (Yahoo Finance)</span>
+                        </label>
+                        <small style="color: #666; margin-top: 5px; display: block;">Unchecked: Simulated data using Geometric Brownian Motion</small>
+                    </div>
+                    
+                    <button type="submit" class="btn">Compare Stocks</button>
+                </form>
+            </div>
+            
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Generating analysis... This may take a few seconds.</p>
+            </div>
+            
+            <div class="error" id="error-message"></div>
+        </div>
+        
+        <div class="results" id="results">
+            <div class="metrics" id="metrics"></div>
+            <div class="visualizations" id="visualizations"></div>
+        </div>
+        
+        <div class="comparison-table" id="comparison-results" style="display: none;">
+            <h2>Comparison Results</h2>
+            <div id="comparison-chart"></div>
+            <table id="comparison-table"></table>
+        </div>
+        
+        <footer>
+            <p><strong>Market Data Analyzer</strong> - Python + OCaml Financial Analytics Engine</p>
+            <p style="margin-top: 10px; opacity: 0.9;">Powered by Geometric Brownian Motion, Matplotlib, and Functional Programming</p>
+        </footer>
+    </div>
+    
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'single') {
+                document.querySelector('.tab:nth-child(1)').classList.add('active');
+                document.getElementById('single-tab').classList.add('active');
+                document.getElementById('results').style.display = 'none';
+                document.getElementById('comparison-results').style.display = 'none';
+            } else {
+                document.querySelector('.tab:nth-child(2)').classList.add('active');
+                document.getElementById('compare-tab').classList.add('active');
+                document.getElementById('results').style.display = 'none';
+                document.getElementById('comparison-results').style.display = 'none';
+            }
+        }
+        
+        document.getElementById('single-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const symbol = document.getElementById('symbol').value.trim().toUpperCase();
+            const days = document.getElementById('days').value;
+            const use_real_data = document.getElementById('use-real-data').checked;
+            
+            document.querySelector('.loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('error-message').style.display = 'none';
+            
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({symbol, days, use_real_data})
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayResults(data);
+                } else {
+                    showError(data.error);
+                }
+            } catch (error) {
+                showError('Failed to generate analysis: ' + error.message);
+            } finally {
+                document.querySelector('.loading').style.display = 'none';
+            }
+        });
+        
+        document.getElementById('compare-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const symbols = document.getElementById('symbols').value.split(',').map(s => s.trim().toUpperCase());
+            const days = document.getElementById('days-compare').value;
+            const use_real_data = document.getElementById('use-real-data-compare').checked;
+            
+            document.querySelector('.loading').style.display = 'block';
+            document.getElementById('comparison-results').style.display = 'none';
+            document.getElementById('error-message').style.display = 'none';
+            
+            try {
+                const response = await fetch('/compare', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({symbols, days, use_real_data})
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayComparison(data);
+                } else {
+                    showError(data.error);
+                }
+            } catch (error) {
+                showError('Failed to compare stocks: ' + error.message);
+            } finally {
+                document.querySelector('.loading').style.display = 'none';
+            }
+        });
+        
+        function displayResults(data) {
+            const metrics = document.getElementById('metrics');
+            const dataSourceBadge = data.data_source.includes('Real') 
+                ? '<span class="badge" style="background: #28a745;">✓ Real Data</span>' 
+                : '<span class="badge" style="background: #ffc107; color: #333;">⚡ Simulated</span>';
+            
+            metrics.innerHTML = `
+                <div class="metric-card" style="grid-column: 1 / -1;">
+                    <div style="margin-bottom: 15px;">
+                        <strong style="font-size: 1.3em;">${data.symbol}</strong> ${dataSourceBadge}
+                    </div>
+                    <div style="color: #666; font-size: 0.9em;">${data.date_range} (${data.days} days)</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">${data.report.mean_price}</div>
+                    <div class="metric-label">Mean Price</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">${data.report.volatility_annual}</div>
+                    <div class="metric-label">Annual Volatility</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">${data.report.sharpe_ratio}</div>
+                    <div class="metric-label">Sharpe Ratio</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">${data.report.total_return}</div>
+                    <div class="metric-label">Total Return</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">${data.report.max_drawdown}</div>
+                    <div class="metric-label">Max Drawdown</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">${data.report.min_price} - ${data.report.max_price}</div>
+                    <div class="metric-label">Price Range</div>
+                </div>
+            `;
+            
+            const visualizations = document.getElementById('visualizations');
+            visualizations.innerHTML = `
+                <div class="viz-card">
+                    <img src="${data.visualizations.dashboard}" alt="Dashboard">
+                    <div class="viz-title">📊 Comprehensive Dashboard</div>
+                </div>
+                <div class="viz-card">
+                    <img src="${data.visualizations.price}" alt="Price History">
+                    <div class="viz-title">📈 Price History</div>
+                </div>
+                <div class="viz-card">
+                    <img src="${data.visualizations.returns}" alt="Returns Distribution">
+                    <div class="viz-title">📉 Returns Distribution</div>
+                </div>
+                <div class="viz-card">
+                    <img src="${data.visualizations.ma}" alt="Moving Averages">
+                    <div class="viz-title">📊 Moving Averages</div>
+                </div>
+                <div class="viz-card">
+                    <img src="${data.visualizations.bollinger}" alt="Bollinger Bands">
+                    <div class="viz-title">📊 Bollinger Bands</div>
+                </div>
+                <div class="viz-card">
+                    <img src="${data.visualizations.volatility}" alt="Volatility">
+                    <div class="viz-title">📊 Rolling Volatility</div>
+                </div>
+            `;
+            
+            document.getElementById('results').style.display = 'block';
+        }
+        
+        function displayComparison(data) {
+            const chartDiv = document.getElementById('comparison-chart');
+            chartDiv.innerHTML = `
+                <div class="viz-card">
+                    <img src="${data.visualization}" alt="Stock Comparison">
+                    <div class="viz-title">📊 Multi-Stock Comparison (Normalized)</div>
+                </div>
+            `;
+            
+            const table = document.getElementById('comparison-table');
+            let tableHTML = '<tr><th>Symbol</th><th>Mean Price</th><th>Volatility</th><th>Return</th><th>Sharpe Ratio</th></tr>';
+            
+            for (const [symbol, report] of Object.entries(data.reports)) {
+                tableHTML += `
+                    <tr>
+                        <td><strong>${symbol}</strong></td>
+                        <td>${report.mean_price}</td>
+                        <td>${report.volatility}</td>
+                        <td>${report.return}</td>
+                        <td>${report.sharpe}</td>
+                    </tr>
+                `;
+            }
+            
+            table.innerHTML = tableHTML;
+            document.getElementById('comparison-results').style.display = 'block';
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = 'Error: ' + message;
+            errorDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

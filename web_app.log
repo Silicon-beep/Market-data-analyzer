@@ -1,0 +1,43 @@
+nohup: ignoring input
+======================================================================
+🌐 Market Data Analyzer - Web Interface
+======================================================================
+
+Starting Flask web server...
+Access the application at: http://localhost:5000
+
+Press Ctrl+C to stop the server
+======================================================================
+ * Serving Flask app 'web_app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.0.2.113:5000
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 118-938-709
+127.0.0.1 - - [12/Nov/2025 04:16:43] "POST /compare HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2025 04:17:16] "POST /compare HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2025 04:17:45] "POST /generate HTTP/1.1" 200 -
+HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: INVALIDSYMBOL123"}}}
+$INVALIDSYMBOL123: possibly delisted; no timezone found
+127.0.0.1 - - [12/Nov/2025 04:18:18] "POST /generate HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2025 04:22:54] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2025 04:23:08] "POST /generate HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2025 04:23:08] "GET /static/images/bollinger_AAPL_20251112_042303.png HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2025 04:23:08] "GET /static/images/dashboard_AAPL_20251112_042303.png HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2025 04:23:08] "GET /static/images/ma_AAPL_20251112_042303.png HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2025 04:23:08] "GET /static/images/returns_AAPL_20251112_042303.png HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2025 04:23:08] "GET /static/images/volatility_AAPL_20251112_042303.png HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2025 04:23:08] "GET /static/images/price_AAPL_20251112_042303.png HTTP/1.1" 200 -
+/workspaces/Market-data-analyzer/src/visualizer.py:47: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`). Consider using `matplotlib.pyplot.close()`.
+  fig, ax = plt.subplots(figsize=figsize)
+127.0.0.1 - - [12/Nov/2025 04:24:04] "POST /generate HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2025 04:24:04] "GET /static/images/price_MSFT_20251112_042359.png HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2025 04:24:04] "GET /static/images/returns_MSFT_20251112_042359.png HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2025 04:24:04] "GET /static/images/bollinger_MSFT_20251112_042359.png HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2025 04:24:04] "GET /static/images/ma_MSFT_20251112_042359.png HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2025 04:24:04] "GET /static/images/volatility_MSFT_20251112_042359.png HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2025 04:24:04] "GET /static/images/dashboard_MSFT_20251112_042359.png HTTP/1.1" 200 -
